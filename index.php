@@ -94,176 +94,261 @@ try {
 }
 ?>
 
-<div class="container">
+<style>
+/* Dashboard Specific UI Enhancements */
+.hover-lift {
+    transition: transform 0.25s cubic-bezier(.02,.01,.47,1), box-shadow 0.25s cubic-bezier(.02,.01,.47,1);
+}
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
+}
+.badge-soft {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+}
+.table-modern > :not(caption) > * > * {
+    padding: 1rem 1.25rem;
+    background-color: transparent;
+    border-bottom: 1px solid rgba(0,0,0,.04);
+}
+.table-modern tbody tr:hover {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+</style>
+
+<div class="container pb-5">
     <!-- Welcome Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
         <div>
-            <h2 class="fw-bold text-dark mb-0">Trang chủ</h2>
-            <p class="text-muted">Tổng hợp tình hình phương tiện & vận hành</p>
+            <h2 class="fw-bolder text-dark mb-1" style="font-family: 'Inter', sans-serif; letter-spacing: -0.5px;">Bảng điều khiển</h2>
+            <p class="text-secondary mb-0">Tổng quan tình hình phương tiện & hoạt động</p>
         </div>
-        <a href="them_xe.php" class="btn btn-primary shadow-sm">
+        <a href="them_xe.php" class="btn btn-primary rounded-pill px-4 shadow-sm fw-semibold" style="background: linear-gradient(135deg, #00467f, #005599); border:none;">
             <i class="fa-solid fa-plus me-2"></i>Thêm Hồ sơ xe
         </a>
     </div>
 
-    <!-- Floating Stats Sidebar (VNPost Style) -->
-    <div class="floating-stats-wrapper">
+    <!-- Main Stats Row -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-5">
         <!-- Card 1: Tổng số xe -->
-        <div class="stats-box-mini" title="Tổng phương tiện">
-            <i class="fa-solid fa-car"></i>
-            <span class="stat-value"><?= number_format($totalVehicles) ?></span>
-            <span class="stat-label">Tổng xe</span>
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm hover-lift" style="border-radius: 20px; background: linear-gradient(135deg, #00467f, #0066b3);">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="bg-white text-primary rounded-circle shadow-sm me-4 d-flex justify-content-center align-items-center" style="width: 58px; height: 58px; font-size: 1.5rem;">
+                        <i class="fa-solid fa-car"></i>
+                    </div>
+                    <div>
+                        <p class="text-white text-opacity-75 mb-1 small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Tổng phương tiện</p>
+                        <h2 class="mb-0 text-white fw-bolder"><?= number_format($totalVehicles) ?></h2>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Card 2: Đang hoạt động -->
-        <div class="stats-box-mini" title="Đang hoạt động">
-            <i class="fa-solid fa-road"></i>
-            <span class="stat-value"><?= number_format($activeVehicles) ?></span>
-            <span class="stat-label">Hoạt động</span>
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm hover-lift" style="border-radius: 20px; background: linear-gradient(135deg, #198754, #20c997);">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="bg-white text-success rounded-circle shadow-sm me-4 d-flex justify-content-center align-items-center" style="width: 58px; height: 58px; font-size: 1.5rem;">
+                        <i class="fa-solid fa-road"></i>
+                    </div>
+                    <div>
+                        <p class="text-white text-opacity-75 mb-1 small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Đang hoạt động</p>
+                        <h2 class="mb-0 text-white fw-bolder"><?= number_format($activeVehicles) ?></h2>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Card 3: Sắp hết đăng kiểm -->
-        <div class="stats-box-mini" onclick="filterInspExpiring()" title="Sắp hết hạn Đăng kiểm">
-            <i class="fa-solid fa-clipboard-check"></i>
-            <?php if($warningInspections > 0): ?>
-                <span class="stat-notify-badge"></span>
-            <?php endif; ?>
-            <span class="stat-value text-danger"><?= number_format($warningInspections) ?></span>
-            <span class="stat-label">Đăng kiểm</span>
+        <div class="col" onclick="filterInspExpiring()" style="cursor: pointer;">
+            <div class="card h-100 border-0 shadow-sm hover-lift" style="border-radius: 20px; background: linear-gradient(135deg, #fdb913, #f5a623);">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="bg-white text-warning rounded-circle shadow-sm me-4 d-flex justify-content-center align-items-center position-relative" style="width: 58px; height: 58px; font-size: 1.5rem;">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                        <?php if($warningInspections > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" style="border-width: 3px !important;"></span>
+                        <?php endif; ?>
+                    </div>
+                    <div>
+                        <p class="text-dark text-opacity-75 mb-1 small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Hết đăng kiểm</p>
+                        <h2 class="mb-0 text-dark fw-bolder"><?= number_format($warningInspections) ?></h2>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Card 4: Cần thay dầu -->
-        <div class="stats-box-mini" onclick="filterOilChange()" title="Xe cần thay dầu (>5000km/tháng)" style="cursor: pointer;">
-            <i class="fa-solid fa-oil-can" style="color: #ff6b6b;"></i>
-            <?php if($needOilChange > 0): ?>
-                <span class="stat-notify-badge"></span>
-            <?php endif; ?>
-            <span class="stat-value <?= $needOilChange > 0 ? 'text-danger' : '' ?>"><?= number_format($needOilChange) ?></span>
-            <span class="stat-label">Thay dầu</span>
+        <div class="col" onclick="filterOilChange()" style="cursor: pointer;">
+            <div class="card h-100 border-0 shadow-sm hover-lift" style="border-radius: 20px; background: linear-gradient(135deg, #dc3545, #e05e5e);">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="bg-white text-danger rounded-circle shadow-sm me-4 d-flex justify-content-center align-items-center position-relative" style="width: 58px; height: 58px; font-size: 1.5rem;">
+                        <i class="fa-solid fa-oil-can"></i>
+                        <?php if($needOilChange > 0): ?>
+                            <span class="position-absolute top-0 start-100 translate-middle p-2 bg-warning border border-light rounded-circle" style="border-width: 3px !important;"></span>
+                        <?php endif; ?>
+                    </div>
+                    <div>
+                        <p class="text-white text-opacity-75 mb-1 small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Cần thay dầu</p>
+                        <h2 class="mb-0 text-white fw-bolder"><?= number_format($needOilChange) ?></h2>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Main Content Column: Vehicles List (Full Width) -->
-        <div class="col-12">
-            <!-- Vehicles List Table -->
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                    <h5 class="mb-0 text-primary fw-bold"><i class="fa-solid fa-list me-2"></i>Danh sách Phương tiện</h5>
-                    <div class="d-flex ms-auto">
-                        <div class="input-group" style="max-width: 350px;">
-                            <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-search text-muted"></i></span>
-                            <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Tìm biển số, loại xe..." autocomplete="off">
-                            <button class="btn btn-outline-danger" type="button" onclick="clearSearch()" id="clearBtn" style="display:none;"><i class="fa-solid fa-times"></i></button>
-                        </div>
-                    </div>
-                    <div id="searchNotification" class="alert alert-warning mt-2 mb-0" style="display:none; position:absolute; top:60px; right:20px; z-index:1000;"></div>
+    <!-- Vehicles List Table Container -->
+    <div class="card border-0 shadow-sm" style="border-radius: 20px; overflow: hidden;">
+        <!-- Card Header & Search -->
+        <div class="card-header bg-white border-0 pt-4 pb-3 px-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <h4 class="mb-0 text-dark fw-bold d-flex align-items-center">
+                <i class="fa-solid fa-list-check text-primary me-3 bg-primary bg-opacity-10 p-2 rounded-3"></i> 
+                Danh sách Phương tiện
+            </h4>
+            
+            <div class="d-flex w-100 w-md-auto justify-content-md-end position-relative">
+                <div class="input-group input-group-lg shadow-sm" style="border-radius: 50px; overflow: hidden; border: 1px solid #eaeaea; background: #fff; max-width: 400px;">
+                    <span class="input-group-text bg-white border-0 pe-2"><i class="fa-solid fa-search text-muted"></i></span>
+                    <input type="text" id="searchInput" class="form-control border-0 ps-1" placeholder="Tìm biển số, đơn vị, loại xe..." style="box-shadow: none;" autocomplete="off">
+                    <button class="btn btn-white border-0 px-3" type="button" onclick="clearSearch()" id="clearBtn" style="display:none; background: #fff;"><i class="fa-solid fa-times text-danger"></i></button>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-custom table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="ps-4">Biển kiểm soát</th>
-                                <th>Đơn vị quản lý</th>
-                                <th>Loại xe & Nhãn hiệu</th>
-                                <th>Năm SX</th>
-                                <th>Số khung / Số máy</th>
-                                <th>Giá trị (VNĐ)</th>
-                                <th>Trạng thái</th>
-                                <th class="text-end pe-4">Hành động</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if(count($vehicles) > 0): ?>
-                                <?php foreach($vehicles as $xe): ?>
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-light rounded-circle p-2 me-3 text-primary">
-                                                <i class="fa-solid fa-truck"></i>
-                                            </div>
-                                            <div>
-                                                <span class="fw-bold text-dark d-block"><?= htmlspecialchars($xe['bien_kiem_soat']) ?></span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info bg-opacity-10 text-info"><?= htmlspecialchars($xe['don_vi_quan_ly'] ?: 'Chưa xác định') ?></span>
-                                    </td>
-                                    <td>
-                                        <span class="fw-semibold d-block"><?= htmlspecialchars($xe['loai_xe'] ?? '---') ?></span>
-                                        <small class="text-secondary"><?= htmlspecialchars($xe['nhan_hieu'] ?? '') ?></small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border">
-                                            <?= htmlspecialchars($xe['nam_san_xuat'] ?? 'N/A') ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="text-sm text-secondary">
-                                            <div>K: <?= htmlspecialchars($xe['so_khung'] ?? '---') ?></div>
-                                            <div>M: <?= htmlspecialchars($xe['so_may'] ?? '---') ?></div>
-                                        </div>
-                                    </td>
-                                    <td class="fw-bold text-success">
-                                        <?= $xe['nguyen_gia'] ? number_format($xe['nguyen_gia']) : '0' ?>
-                                    </td>
-                                    <td>
-                                        <?php if($xe['trang_thai'] == 1): ?>
-                                            <span class="badge bg-success bg-opacity-10 text-success">Hoạt động</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary">Dừng</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="text-end pe-4">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <a href="chi_tiet.php?id=<?= $xe['id'] ?>" class="btn btn-sm btn-outline-primary shadow-sm" title="Xem chi tiết">
-                                                <i class="fa-solid fa-eye"></i>
-                                            </a>
-                                            <form method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn đổi trạng thái xe này?');">
-                                                <input type="hidden" name="action" value="toggle_status">
-                                                <input type="hidden" name="vehicle_id" value="<?= $xe['id'] ?>">
-                                                <input type="hidden" name="current_status" value="<?= $xe['trang_thai'] ?>">
-                                                <?php if($xe['trang_thai'] == 1): ?>
-                                                    <button type="submit" class="btn btn-sm btn-outline-success shadow-sm" title="Đang hoạt động - Bấm để Dừng">
-                                                        <i class="fa-solid fa-toggle-on"></i>
-                                                    </button>
-                                                <?php else: ?>
-                                                    <button type="submit" class="btn btn-sm btn-outline-secondary shadow-sm" title="Dừng hoạt động - Bấm để Kích hoạt">
-                                                        <i class="fa-solid fa-toggle-off"></i>
-                                                    </button>
-                                                <?php endif; ?>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr id="noResultRow">
-                                    <td colspan="8" class="text-center py-5">
-                                        <div class="text-muted">
-                                            <i class="fa-solid fa-folder-open fa-3x mb-3 opacity-25"></i>
-                                            <p>Chưa có phương tiện nào trong hệ thống.</p>
-                                            <a href="them_xe.php" class="btn btn-primary btn-sm mt-2">Thêm mới ngay</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- Pagination -->
-                <div class="card-footer bg-white py-3">
-                    <nav>
-                        <ul class="pagination justify-content-end mb-0">
-                            <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">Sau</a></li>
-                        </ul>
-                    </nav>
-                </div>
+                <div id="searchNotification" class="alert alert-danger py-2 px-3 shadow-sm mb-0" style="display:none; position:absolute; top: 110%; right: 0; z-index:100; border-radius: 12px; min-width: 200px;"></div>
             </div>
+        </div>
+
+        <!-- Table Data -->
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-borderless table-modern align-middle mb-0 w-100">
+                    <thead style="background-color: #f8f9fa;">
+                        <tr>
+                            <th class="ps-4 text-secondary fw-semibold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Biển kiểm soát</th>
+                            <th class="text-secondary fw-semibold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Đơn vị quản lý</th>
+                            <th class="text-secondary fw-semibold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Loại & Nhãn hiệu</th>
+                            <th class="text-secondary fw-semibold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Năm SX</th>
+                            <th class="text-secondary fw-semibold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Khung/Máy</th>
+                            <th class="text-secondary fw-semibold text-uppercase text-end" style="font-size: 0.8rem; letter-spacing: 0.5px;">Giá trị (VNĐ)</th>
+                            <th class="text-secondary fw-semibold text-uppercase text-center" style="font-size: 0.8rem; letter-spacing: 0.5px;">Trạng thái</th>
+                            <th class="text-secondary fw-semibold text-uppercase text-end pe-4" style="font-size: 0.8rem; letter-spacing: 0.5px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if(count($vehicles) > 0): ?>
+                            <?php foreach($vehicles as $xe): ?>
+                            <tr style="transition: all 0.2s;">
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                            <i class="fa-solid fa-truck fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-bolder text-dark d-block fs-6"><?= htmlspecialchars($xe['bien_kiem_soat']) ?></span>
+                                            <span class="text-muted small">ID: #<?= $xe['id'] ?></span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info bg-opacity-10 text-info fw-semibold border border-info border-opacity-25 px-3 py-2 rounded-pill"><?= htmlspecialchars($xe['don_vi_quan_ly'] ?: 'Chưa xác định') ?></span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-dark d-block"><?= htmlspecialchars($xe['loai_xe'] ?? '---') ?></span>
+                                    <span class="text-secondary small"><?= htmlspecialchars($xe['nhan_hieu'] ?? '') ?></span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">
+                                        <?= htmlspecialchars($xe['nam_san_xuat'] ?? 'N/A') ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="small text-secondary font-monospace">
+                                        <div title="Số Khung"><span class="text-muted">K:</span> <?= htmlspecialchars($xe['so_khung'] ?? '---') ?></div>
+                                        <div title="Số Máy"><span class="text-muted">M:</span> <?= htmlspecialchars($xe['so_may'] ?? '---') ?></div>
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-success text-end">
+                                    <?= $xe['nguyen_gia'] ? number_format($xe['nguyen_gia']) : '0' ?>
+                                </td>
+                                <td class="text-center">
+                                    <?php if($xe['trang_thai'] == 1): ?>
+                                        <span class="badge bg-success bg-opacity-10 text-success fw-semibold border border-success border-opacity-25 px-3 py-2 rounded-pill mb-1 d-inline-block"><i class="fa-solid fa-circle-check me-1"></i>Hoạt động</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary fw-semibold border border-secondary border-opacity-25 px-3 py-2 rounded-pill mb-1 d-inline-block"><i class="fa-solid fa-circle-minus me-1"></i>Đã Dừng</span>
+                                    <?php endif; ?>
+                                    
+                                    <?php 
+                                    // Hiển thị cảnh báo thay dầu (chips)
+                                    if(isset($oilWarnings[$xe['id']])): 
+                                        foreach($oilWarnings[$xe['id']] as $w): 
+                                    ?>
+                                        <div class="d-inline-flex align-items-center bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-pill px-2 py-1 mt-1">
+                                            <i class="fa-solid fa-oil-can text-danger small me-1"></i>
+                                            <span class="text-danger small fw-bold me-2">T<?= $w['thang'] ?>/<?= $w['nam'] ?></span>
+                                            <button type="button" class="btn btn-sm btn-danger rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm" style="width: 20px; height: 20px;" onclick="markOilChanged(<?= $xe['id'] ?>, <?= $w['thang'] ?>, <?= $w['nam'] ?>, this)" title="Xác nhận đã thay dầu">
+                                                <i class="fa-solid fa-check" style="font-size: 10px;"></i>
+                                            </button>
+                                        </div>
+                                    <?php 
+                                        endforeach;
+                                    endif; 
+                                    ?>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="chi_tiet.php?id=<?= $xe['id'] ?>" class="btn btn-light text-primary shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" title="Xem chi tiết">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <form method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn đổi trạng thái xe này?');">
+                                            <input type="hidden" name="action" value="toggle_status">
+                                            <input type="hidden" name="vehicle_id" value="<?= $xe['id'] ?>">
+                                            <input type="hidden" name="current_status" value="<?= $xe['trang_thai'] ?>">
+                                            <?php if($xe['trang_thai'] == 1): ?>
+                                                <button type="submit" class="btn btn-light text-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" title="Tạm dừng xe">
+                                                    <i class="fa-solid fa-pause"></i>
+                                                </button>
+                                            <?php else: ?>
+                                                <button type="submit" class="btn btn-light text-success shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" title="Kích hoạt xe">
+                                                    <i class="fa-solid fa-play"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr id="noResultRow">
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted d-flex flex-column align-items-center">
+                                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                            <i class="fa-solid fa-folder-open fs-1 text-secondary opacity-50"></i>
+                                        </div>
+                                        <h5 class="fw-bold text-dark">Chưa có phương tiện nào</h5>
+                                        <p>Hệ thống hiện tại chưa có dữ liệu hoặc không tìm thấy kết quả.</p>
+                                        <a href="them_xe.php" class="btn btn-primary rounded-pill px-4 shadow-sm mt-2">Thêm xe mới ngay</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="card-footer bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center" style="border-top: 1px solid #f4f6f9 !important;">
+            <div class="text-muted small">
+                Hiển thị <span class="fw-bold text-dark">Tất cả</span> phương tiện
+            </div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0 shadow-sm rounded-pill overflow-hidden">
+                    <li class="page-item disabled"><a class="page-link border-0 text-muted" href="#">Trước</a></li>
+                    <li class="page-item active"><a class="page-link border-0" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link border-0 text-dark" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link border-0 text-dark" href="#">Sau</a></li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -297,7 +382,7 @@ function searchVehicles() {
     });
     
     if (currentDisplayedVehicles.length === 0) {
-        notification.innerHTML = '<i class="fa-solid fa-exclamation-triangle me-2"></i>Xe không tồn tại';
+        notification.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-2"></i>Không tìm thấy xe!';
         notification.style.display = 'block';
         setTimeout(() => {
             notification.style.display = 'none';
@@ -326,7 +411,6 @@ function filterInspExpiring() {
     
     currentDisplayedVehicles = allVehicles.filter(xe => expiringVehicleIds.includes(xe.id));
     
-    // Update UI to show filter state
     document.getElementById('searchInput').value = 'Lọc: Sắp hết đăng kiểm (' + expiringVehicleIds.length + ' xe)';
     document.getElementById('clearBtn').style.display = 'inline-block';
     
@@ -341,7 +425,6 @@ function filterOilChange() {
     
     currentDisplayedVehicles = allVehicles.filter(xe => oilChangeVehicleIds.includes(xe.id));
     
-    // Update UI to show filter state
     document.getElementById('searchInput').value = 'Lọc: Cần thay dầu (' + oilChangeVehicleIds.length + ' xe)';
     document.getElementById('clearBtn').style.display = 'inline-block';
     
@@ -355,9 +438,12 @@ function renderVehicles() {
         tbody.innerHTML = `
             <tr id="noResultRow">
                 <td colspan="8" class="text-center py-5">
-                    <div class="text-muted">
-                        <i class="fa-solid fa-search fa-3x mb-3 opacity-25"></i>
-                        <p>Không tìm thấy xe phù hợp với từ khóa tìm kiếm.</p>
+                    <div class="text-muted d-flex flex-column align-items-center">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="fa-solid fa-search fs-1 text-secondary opacity-50"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark">Không tìm thấy kết quả</h5>
+                        <p>Vui lòng thử lại với từ khóa khác.</p>
                     </div>
                 </td>
             </tr>
@@ -368,15 +454,15 @@ function renderVehicles() {
     let html = '';
     currentDisplayedVehicles.forEach(xe => {
         const statusBadge = xe.trang_thai == 1 
-            ? '<span class="badge bg-success bg-opacity-10 text-success">Hoạt động</span>'
-            : '<span class="badge bg-secondary bg-opacity-10 text-secondary">Dừng</span>';
+            ? '<span class="badge bg-success bg-opacity-10 text-success fw-semibold border border-success border-opacity-25 px-3 py-2 rounded-pill mb-1 d-inline-block"><i class="fa-solid fa-circle-check me-1"></i>Hoạt động</span>'
+            : '<span class="badge bg-secondary bg-opacity-10 text-secondary fw-semibold border border-secondary border-opacity-25 px-3 py-2 rounded-pill mb-1 d-inline-block"><i class="fa-solid fa-circle-minus me-1"></i>Đã Dừng</span>';
         
         const toggleBtn = xe.trang_thai == 1
-            ? `<button type="submit" class="btn btn-sm btn-outline-success shadow-sm" title="Đang hoạt động - Bấm để Dừng">
-                   <i class="fa-solid fa-toggle-on"></i>
+            ? `<button type="submit" class="btn btn-light text-danger shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" title="Tạm dừng xe">
+                   <i class="fa-solid fa-pause"></i>
                </button>`
-            : `<button type="submit" class="btn btn-sm btn-outline-secondary shadow-sm" title="Dừng hoạt động - Bấm để Kích hoạt">
-                   <i class="fa-solid fa-toggle-off"></i>
+            : `<button type="submit" class="btn btn-light text-success shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" title="Kích hoạt xe">
+                   <i class="fa-solid fa-play"></i>
                </button>`;
 
         // --- Render Oil Warnings ---
@@ -384,58 +470,58 @@ function renderVehicles() {
         if (oilWarningsMap[xe.id] && oilWarningsMap[xe.id].length > 0) {
             oilWarningsMap[xe.id].forEach(w => {
                 oilWarningsHtml += `
-                    <div class="d-flex align-items-center gap-2 mt-1 alert alert-danger p-1 mb-0 small" style="width: fit-content;">
-                        <span><i class="fa-solid fa-oil-can me-1"></i>Thay dầu T${w.thang}/${w.nam}</span>
-                        <button type="button" class="btn btn-xs btn-light border btn-sm py-0 px-1" 
-                                onclick="markOilChanged(${xe.id}, ${w.thang}, ${w.nam}, this)" 
-                                title="Đánh dấu đã thay">
-                            <i class="fa-solid fa-check text-success"></i>
+                    <div class="d-inline-flex align-items-center bg-danger bg-opacity-10 border border-danger border-opacity-25 rounded-pill px-2 py-1 mt-1">
+                        <i class="fa-solid fa-oil-can text-danger small me-1"></i>
+                        <span class="text-danger small fw-bold me-2">T${w.thang}/${w.nam}</span>
+                        <button type="button" class="btn btn-sm btn-danger rounded-circle p-0 d-flex align-items-center justify-content-center shadow-sm" style="width: 20px; height: 20px;" onclick="markOilChanged(${xe.id}, ${w.thang}, ${w.nam}, this)" title="Xác nhận đã thay dầu">
+                            <i class="fa-solid fa-check" style="font-size: 10px;"></i>
                         </button>
                     </div>
                 `;
             });
         }
-        // ---------------------------
         
         html += `
-            <tr>
+            <tr style="transition: all 0.2s;">
                 <td class="ps-4">
                     <div class="d-flex align-items-center">
-                        <div class="bg-light rounded-circle p-2 me-3 text-primary">
-                            <i class="fa-solid fa-truck"></i>
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                            <i class="fa-solid fa-truck fs-5"></i>
                         </div>
                         <div>
-                            <span class="fw-bold text-dark d-block">${escapeHtml(xe.bien_kiem_soat)}</span>
-                            <small class="text-muted">ID: #${xe.id}</small>
+                            <span class="fw-bolder text-dark d-block fs-6">${escapeHtml(xe.bien_kiem_soat)}</span>
+                            <span class="text-muted small">ID: #${xe.id}</span>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <span class="badge bg-info bg-opacity-10 text-info">${escapeHtml(xe.don_vi_quan_ly || 'Chưa xác định')}</span>
+                    <span class="badge bg-info bg-opacity-10 text-info fw-semibold border border-info border-opacity-25 px-3 py-2 rounded-pill">${escapeHtml(xe.don_vi_quan_ly || 'Chưa xác định')}</span>
                 </td>
                 <td>
-                    <span class="fw-semibold d-block">${escapeHtml(xe.loai_xe || '---')}</span>
-                    <small class="text-secondary">${escapeHtml(xe.nhan_hieu || '')}</small>
+                    <span class="fw-bold text-dark d-block">${escapeHtml(xe.loai_xe || '---')}</span>
+                    <span class="text-secondary small">${escapeHtml(xe.nhan_hieu || '')}</span>
                 </td>
                 <td>
-                    <span class="badge bg-light text-dark border">${escapeHtml(xe.nam_san_xuat || 'N/A')}</span>
+                    <span class="badge bg-light text-secondary border px-3 py-2 rounded-pill">
+                        ${escapeHtml(xe.nam_san_xuat || 'N/A')}
+                    </span>
                 </td>
                 <td>
-                    <div class="text-sm text-secondary">
-                        <div>K: ${escapeHtml(xe.so_khung || '---')}</div>
-                        <div>M: ${escapeHtml(xe.so_may || '---')}</div>
+                    <div class="small text-secondary font-monospace">
+                        <div title="Số Khung"><span class="text-muted">K:</span> ${escapeHtml(xe.so_khung || '---')}</div>
+                        <div title="Số Máy"><span class="text-muted">M:</span> ${escapeHtml(xe.so_may || '---')}</div>
                     </div>
                 </td>
-                <td class="fw-bold text-success">
+                <td class="fw-bold text-success text-end">
                     ${xe.nguyen_gia ? Number(xe.nguyen_gia).toLocaleString('vi-VN') : '0'}
                 </td>
-                <td>
-                    ${statusBadge}
+                <td class="text-center">
+                    ${statusBadge}<br>
                     ${oilWarningsHtml}
                 </td>
                 <td class="text-end pe-4">
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="chi_tiet.php?id=${xe.id}" class="btn btn-sm btn-outline-primary shadow-sm" title="Xem chi tiết">
+                        <a href="chi_tiet.php?id=${xe.id}" class="btn btn-light text-primary shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" title="Xem chi tiết">
                             <i class="fa-solid fa-eye"></i>
                         </a>
                         <form method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn đổi trạng thái xe này?');">
@@ -462,8 +548,7 @@ function markOilChanged(vId, month, year, btn) {
     formData.append('year', year);
     formData.append('status', 1); // 1 = Đã thay
 
-    // Disable button
-    const container = btn.closest('.alert');
+    const container = btn.closest('.d-inline-flex');
     btn.disabled = true;
 
     fetch('ajax_update_oil.php', {
@@ -473,16 +558,10 @@ function markOilChanged(vId, month, year, btn) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Remove the warning from UI
             container.remove();
             
-            // Update the global map so re-renders don't show it again
             if (oilWarningsMap[vId]) {
                 oilWarningsMap[vId] = oilWarningsMap[vId].filter(w => !(w.thang == month && w.nam == year));
-                if (oilWarningsMap[vId].length === 0) {
-                    // Update counters if needed, but page refresh is easier to fully sync top stats
-                    // For now, just remove from map
-                }
             }
         } else {
             alert('Lỗi: ' + (data.message || 'Unknown'));
@@ -503,7 +582,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Enable search on Enter key
 document.getElementById('searchInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         searchVehicles();
