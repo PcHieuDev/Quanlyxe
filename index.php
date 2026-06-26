@@ -108,9 +108,10 @@ try {
     color: var(--bs-primary);
 }
 .table-modern > :not(caption) > * > * {
-    padding: 1rem 1.25rem;
+    padding: 1rem 0.75rem;
     background-color: transparent;
     border-bottom: 1px solid rgba(0,0,0,.04);
+    white-space: nowrap;
 }
 .table-modern tbody tr:hover {
     background-color: #f8f9fa;
@@ -262,7 +263,7 @@ try {
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="small text-secondary font-monospace">
+                                    <div class="small text-secondary font-monospace" style="white-space: nowrap;">
                                         <div title="Số Khung"><span class="text-muted">K:</span> <?= htmlspecialchars($xe['so_khung'] ?? '---') ?></div>
                                         <div title="Số Máy"><span class="text-muted">M:</span> <?= htmlspecialchars($xe['so_may'] ?? '---') ?></div>
                                     </div>
@@ -507,7 +508,7 @@ function renderVehicles() {
                     </span>
                 </td>
                 <td>
-                    <div class="small text-secondary font-monospace">
+                    <div class="small text-secondary font-monospace" style="white-space: nowrap;">
                         <div title="Số Khung"><span class="text-muted">K:</span> ${escapeHtml(xe.so_khung || '---')}</div>
                         <div title="Số Máy"><span class="text-muted">M:</span> ${escapeHtml(xe.so_may || '---')}</div>
                     </div>
