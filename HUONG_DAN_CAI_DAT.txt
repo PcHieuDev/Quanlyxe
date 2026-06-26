@@ -1,0 +1,23 @@
+=== HƯỚNG DẪN CÀI ĐẶT TRÊN MÁY MỚI ===
+
+BƯỚC 1: CHUẨN BỊ DATABASE
+1. Cài đặt Laragon hoặc XAMPP trên máy mới.
+2. Mở phpMyAdmin (http://localhost/phpmyadmin).
+3. Tạo một Database mới đặt tên là: quan_ly_xe_oto (chọn utf8mb4_unicode_ci).
+4. Chọn Database vừa tạo, bấm tab "Import" (Nhập).
+5. Chọn file "quan_ly_xe_oto.sql" (bạn cần export từ máy cũ và để vào đây).
+6. Bấm "Go" (Thực hiện) để nạp dữ liệu.
+
+BƯỚC 2: CẤU HÌNH KẾT NỐI
+1. Mở file: includes/config.php
+2. Kiểm tra phần password:
+   - Nếu dùng XAMPP/Laragon mặc định: $password = "matkhau"; (để trống)
+   - Nếu máy mới có đặt mật khẩu MySQL: điền mật khẩu vào.
+
+BƯỚC 3: CHẠY DỰ ÁN
+1. Mở trình duyệt truy cập: http://localhost/Quanlyxe
+2. Đăng nhập với tài khoản cũ của bạn.
+
+LƯU Ý:
+- Thư mục 'vendor' chứa các thư viện cần thiết, ĐỪNG XÓA NÓ.
+- Nếu gặp lỗi "Kết nối thất bại", hãy kiểm tra lại BƯỚC 2.
