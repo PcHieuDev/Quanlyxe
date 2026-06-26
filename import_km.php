@@ -379,8 +379,9 @@ $current_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="row g-4">
         <!-- Form Upload -->
         <div class="col-lg-4">
+            <div class="card shadow-sm border-primary">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fa-solid fa-upload me-2"></i>Import Dữ Liệu</h5>
+                    <h5 class="mb-0 text-white"><i class="fa-solid fa-upload me-2"></i>Import Dữ Liệu</h5>
                 </div>
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
@@ -427,7 +428,7 @@ $current_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
             
-            <div class="alert alert-warning small mt-3">
+            <div class="alert alert-warning small mt-3 shadow-sm">
                 <i class="fa-solid fa-exclamation-triangle me-1"></i>
                 Lưu ý: Dữ liệu sẽ được import vào Tháng/Năm bạn chọn ở trên.
             </div>
@@ -435,7 +436,7 @@ $current_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <!-- Block Google Sheet Sync -->
             <div class="card mt-4 shadow-sm border-success">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fa-brands fa-google me-2"></i>Đồng bộ từ Google Sheet</h5>
+                    <h5 class="mb-0 text-white"><i class="fa-brands fa-google me-2"></i>Đồng bộ từ Google Sheet</h5>
                 </div>
                 <div class="card-body">
                     <p class="small text-muted mb-3">
