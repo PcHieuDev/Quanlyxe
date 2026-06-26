@@ -64,10 +64,11 @@ function createSyncPanel() {
                     }
                 }
 
-                const total = tds[tds.length - 1].textContent.trim();
+                const totalStr = tds[tds.length - 1].textContent.trim();
+                const totalNum = parseFloat(totalStr.replace(/,/g, ''));
 
-                if (plate && total) {
-                    data.push({ bien_so: plate, km: total });
+                if (plate && !isNaN(totalNum)) {
+                    data.push({ bien_so: plate, km: totalNum });
                 }
             }
         });
