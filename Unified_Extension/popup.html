@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Báo cáo BĐ Nghệ An</title>
+  <meta name="description" content="Sidebar Chrome xuất báo cáo KPI DKCL BĐ Nghệ An theo tỉnh hoặc bưu cục ra Excel." />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+
+<body>
+  <main class="app-shell horizontal-shell">
+    <div class="horizontal-scroll">
+
+      <!-- Cột 1: Branding -->
+      <section class="col-branding" aria-labelledby="page-title">
+        <img src="icons/logo_menu.png" class="logo-large" aria-hidden="true" alt="Logo">
+        <h1 id="page-title">Báo cáo BĐ Nghệ An</h1>
+        <p class="subtitle">Thao tác nhánh, nhanh chóng lấy số liệu</p>
+        <button id="pin-ui" class="pin-ui-btn" type="button" aria-pressed="false" title="Ghim giao diện báo cáo">
+          <span class="pin-icon" aria-hidden="true">📌</span>
+          <span class="pin-text">Ghim Panel</span>
+        </button>
+      </section>
+
+      <form id="report-form" class="col-controls">
+        <!-- Cột 2: Thời gian & Trọng số -->
+        <div class="card panel-card group-settings">
+          <div class="section-title">Thiết lập tham số</div>
+
+          <div class="field" style="margin-bottom: 16px;">
+            <span style="color: #fccf20; font-weight: bold; margin-bottom: 8px;">Tỉnh / Thành phố</span>
+            <select id="province-select" class="form-select"
+              style="width: 100%; border: 1px solid rgba(255,255,255,0.22); border-radius: 8px; padding: 10px 8px; color: #fff; background: rgba(0, 0, 0, 0.4); outline: none; font-size: 13px; font-weight: bold;">
+              <option value="46" selected>BĐ Nghệ An (46)</option>
+            </select>
+          </div>
+
+          <div class="period-grid">
+            <fieldset class="period-card">
+              <legend>Đầu kỳ</legend>
+              <div class="field-grid">
+                <label class="field" for="from-date-display">
+                  <span>Từ ngày</span>
+                  <div class="date-control">
+                    <input id="from-date-display" class="date-display" type="text" placeholder="dd/MM/yyyy"
+                      autocomplete="off" />
+                    <button class="date-picker-btn" type="button">📅</button>
+                    <input id="from-date" class="date-native" type="date" required tabindex="-1" />
+                  </div>
+                </label>
+                <label class="field" for="to-date-display">
+                  <span>Đến ngày</span>
+                  <div class="date-control">
+                    <input id="to-date-display" class="date-display" type="text" placeholder="dd/MM/yyyy"
+                      autocomplete="off" />
+                    <button class="date-picker-btn" type="button">📅</button>
+                    <input id="to-date" class="date-native" type="date" required tabindex="-1" />
+                  </div>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="period-card">
+              <legend>Kỳ so sánh</legend>
+              <div class="field-grid">
+                <label class="field" for="next-from-date-display">
+                  <span>Từ ngày</span>
+                  <div class="date-control">
+                    <input id="next-from-date-display" class="date-display" type="text" placeholder="dd/MM/yyyy"
+                      autocomplete="off" />
+                    <button class="date-picker-btn" type="button">📅</button>
+                    <input id="next-from-date" class="date-native" type="date" required tabindex="-1" />
+                  </div>
+                </label>
+                <label class="field" for="next-to-date-display">
+                  <span>Đến ngày</span>
+                  <div class="date-control">
+                    <input id="next-to-date-display" class="date-display" type="text" placeholder="dd/MM/yyyy"
+                      autocomplete="off" />
+                    <button class="date-picker-btn" type="button">📅</button>
+                    <input id="next-to-date" class="date-native" type="date" required tabindex="-1" />
+                  </div>
+                </label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="weight-group">
+            <div class="section-label">Trọng số bình quân cột P</div>
+            <div class="weight-grid">
+              <label class="field weight-field" for="weight-tmdt">
+                <span>TMĐT (%)</span>
+                <input id="weight-tmdt" type="number" min="0" max="100" step="0.01" value="40" required />
+              </label>
+              <label class="field weight-field" for="weight-traditional">
+                <span>Tr/Thống (%)</span>
+                <input id="weight-traditional" type="number" min="0" max="100" step="0.01" value="30" required />
+              </label>
+              <label class="field weight-field" for="weight-pickup">
+                <span>Thu gom (%)</span>
+                <input id="weight-pickup" type="number" min="0" max="100" step="0.01" value="30" required />
+              </label>
+            </div>
+          </div>
+          <div class="cloud-group"
+            style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div class="section-label">Cấu hình đẩy Cloud (JSONBin)</div>
+            <div class="field-grid" style="grid-template-columns: 1fr 1fr; gap: 8px;">
+              <label class="field">
+                <span>Bin ID</span>
+                <input id="jsonbin-id" type="text" placeholder="Bin ID" value="6a18f249ddf5aa59f7726bf5"
+                  style="width: 100%; box-sizing: border-box;" />
+              </label>
+              <label class="field">
+                <span>API Key</span>
+                <input id="jsonbin-key" type="password" placeholder="API Key"
+                  value="$2a$10$ypWP2Gl96eiyfpJsmJ2JMemNAc8/UlLN0LUqYxtqbmQnRcixQOnqi"
+                  style="width: 100%; box-sizing: border-box;" />
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Cột 3: Báo cáo V1 & V2 -->
+        <div class="card panel-card group-actions">
+
+          <div class="action-section">
+            <div class="section-title">Xuất báo cáo V1</div>
+            <div class="button-grid">
+              <button id="export-province" class="btn btn-primary" type="button" data-group="TINH">
+                Báo cáo Tỉnh (V1)
+              </button>
+              <button id="export-post-office" class="btn btn-primary" type="button" data-group="BC">
+                Báo cáo Bưu cục (V1)
+              </button>
+              <button id="export-province-template" class="btn btn-primary" type="button">
+                So sánh kỳ (V1)
+              </button>
+            </div>
+          </div>
+
+          <div class="action-section v2-section">
+            <div class="section-title">Xuất báo cáo V2</div>
+            <div class="button-grid">
+              <button id="export-province-v2" class="btn btn-v2" type="button" data-v2-group="TINH" data-v2-mode="data">
+                Báo cáo Tỉnh (V2)
+              </button>
+              <button id="export-post-office-v2" class="btn btn-v2" type="button" data-v2-group="BC"
+                data-v2-mode="data">
+                Báo cáo Bưu cục (V2)
+              </button>
+              <button id="export-compare-v2" class="btn btn-v2" type="button" data-v2-group="TINH"
+                data-v2-mode="compare">
+                So sánh kỳ (V2)
+              </button>
+              <button id="compose-message-btn" class="btn btn-v2" type="button"
+                style="background: #28a745; border-color: #28a745; grid-column: span 3;">
+                💬 Soạn tin nhắn báo cáo (V2)
+            </div>
+          </div>
+
+
+
+        </div>
+      </form>
+
+      <!-- Cột 4: Kết quả -->
+      <section id="report-panel" class="card panel-card col-results is-empty" aria-labelledby="report-title">
+        <div class="report-head">
+          <h2 id="report-title">Trạng thái dữ liệu</h2>
+          <span id="report-badge" class="report-badge">Chưa có</span>
+        </div>
+
+
+
+        <div id="status" class="status">Sẵn sàng. Hãy chọn ngày và xuất báo cáo.</div>
+
+        <div id="empty-state" class="empty-state">
+          <div class="empty-icon">📊</div>
+          <strong>Chưa tải dữ liệu</strong>
+          <span>Dữ liệu sẽ hiển thị tại đây khi đang xử lý.</span>
+        </div>
+
+        <div id="report-summary" class="report-summary" hidden></div>
+        <div id="copy-btn-container"
+          style="text-align: right; margin-bottom: 8px; display: flex; gap: 8px; justify-content: flex-end;" hidden>
+          <a id="visit-web-btn" class="btn btn-v2" href="https://baocaohangngay.netlify.app/" target="_blank"
+            style="background: #28a745; border-color: #28a745; padding: 4px 12px; font-size: 13px; font-weight: bold; color: white; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block;">🌐
+            Truy cập Web đo kiểm</a>
+          <button id="push-cloud-btn" class="btn btn-v2" type="button"
+            style="background: #e67e22; border-color: #d35400; padding: 4px 12px; font-size: 13px; font-weight: bold; color: white; border-radius: 4px; cursor: pointer; transition: all 0.2s;">☁️
+            Đẩy lên Cloud</button>
+          <button id="copy-message-btn" class="btn btn-v2" type="button"
+            style="background: #17a2b8; border-color: #17a2b8; padding: 4px 12px; font-size: 13px; font-weight: bold; color: white; border-radius: 4px; cursor: pointer; transition: all 0.2s;">📋
+            Copy tin nhắn</button>
+        </div>
+        <pre id="report-text" class="report-text" hidden></pre>
+      </section>
+      <!-- Cột 5: Cấu hình mở rộng -->
+      <section class="card panel-card col-config" style="display: none;">
+        <div class="report-head">
+          <h2>Cấu hình mở rộng</h2>
+        </div>
+        <div class="cloud-group" style="margin-top: 15px;">
+          <div class="section-label">Cấu hình Google Sheets (Dashboard)</div>
+          <div class="field-grid" style="grid-template-columns: 1fr; gap: 8px;">
+            <label class="field">
+              <span>Google Apps Script URL</span>
+              <input id="sheets-url" type="text" placeholder="https://script.google.com/macros/s/.../exec"
+                style="width: 100%; box-sizing: border-box;" />
+            </label>
+            <button id="test-sheets-btn" class="btn btn-v2" type="button" style="margin-top: 4px; padding: 10px; font-size: 12px; background: rgba(255,255,255,0.15);">
+              🚀 Test kết nối Sheets
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script src="popup.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VNPOST Report Dashboard</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(0, 0, 0, 0.08);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent-blue: #2563eb;
+      --accent-indigo: #4f46e5;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --accent-rose: #e11d48;
+      --glow-blue: rgba(37, 99, 235, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Layout */
+    header {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 16px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-indigo) 100%);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .logo-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(to right, #1e293b, #4f46e5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .tab-btn.active {
+      color: #4f46e5;
+      background: rgba(79, 70, 229, 0.1);
+      border-color: rgba(79, 70, 229, 0.2);
+      box-shadow: 0 0 15px rgba(79, 70, 229, 0.05);
+    }
+
+    main {
+      padding: 30px 40px;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .view-panel {
+      display: none;
+      animation: fadeIn 0.4s ease-out forwards;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .view-panel.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Controls Row */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .select-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+
+    .select-container label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    select {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    select option {
+      background: #ffffff;
+      color: var(--text-main);
+    }
+
+    .btn-sync {
+      background: linear-gradient(135deg, var(--accent-indigo) 0%, #4f46e5 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+      transition: all 0.3s;
+    }
+
+    .btn-sync:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-sync:active {
+      transform: translateY(1px);
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .kpi-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent-indigo);
+    }
+
+    .kpi-card.blue::before {
+      background: var(--accent-blue);
+    }
+
+    .kpi-card.emerald::before {
+      background: var(--accent-emerald);
+    }
+
+    .kpi-card.amber::before {
+      background: var(--accent-amber);
+    }
+
+    .kpi-card.rose::before {
+      background: var(--accent-rose);
+    }
+
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .kpi-title {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi-icon {
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .kpi-subtext {
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .trend-up {
+      color: var(--accent-emerald);
+    }
+
+    .trend-down {
+      color: var(--accent-rose);
+    }
+
+    .trend-neutral {
+      color: var(--text-muted);
+    }
+
+    /* Dashboard Details */
+    .dashboard-details {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 25px;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-details {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      padding-bottom: 12px;
+    }
+
+    /* Charts Container */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+      }
+
+      .nav-tabs {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        justify-content: flex-start;
+      }
+
+      .tab-btn {
+        white-space: nowrap;
+      }
+
+      main {
+        padding: 15px;
+      }
+
+      .controls-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .chart-container {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 16px;
+      height: 320px;
+      position: relative;
+    }
+
+    /* Alerts and message output */
+    .alert-item {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.2);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .alert-icon {
+      color: var(--accent-rose);
+      margin-top: 2px;
+    }
+
+    .top-unit-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.4);
+      border: 1px solid var(--glass-border);
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .top-unit-name {
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .top-unit-val {
+      font-weight: 700;
+      color: var(--accent-indigo);
+      background: rgba(79, 70, 229, 0.1);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .alert-text {
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    .empty-alerts {
+      color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    textarea.message-viewer {
+      width: 100%;
+      height: 250px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-family: monospace;
+      padding: 14px;
+      font-size: 13px;
+      resize: none;
+      outline: none;
+      line-height: 1.5;
+    }
+
+    /* Sheet Iframe */
+    .sheet-container {
+      width: 100%;
+      height: calc(100vh - 150px);
+      min-height: 600px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      position: relative;
+    }
+
+    iframe.sheet-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .sheet-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 40px;
+      text-align: center;
+      gap: 15px;
+    }
+
+    .sheet-placeholder i {
+      font-size: 60px;
+      color: var(--accent-amber);
+      margin-bottom: 10px;
+    }
+
+    .input-sheet-url {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--text-main);
+      font-family: inherit;
+      outline: none;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .input-sheet-url:focus {
+      border-color: var(--accent-indigo);
+    }
+
+    /* Settings View */
+    .settings-grid {
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Utility */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      gap: 20px;
+    }
+
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border-left-color: var(--accent-indigo);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Loading State -->
+  <div id="loading-screen" class="loading-overlay">
+    <div class="spinner"></div>
+    <h3 id="loading-text" style="font-weight: 500;">Đang đồng bộ dữ liệu...</h3>
+  </div>
+
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+      <div class="logo-title">VNPOST Report Dashboard</div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('overview')">
+        <i class="fa-solid fa-chart-pie"></i> Tổng quan
+      </button>
+      <button class="tab-btn" onclick="switchTab('details')">
+        <i class="fa-solid fa-table"></i> Chi tiết (Google Sheets)
+      </button>
+      <button class="tab-btn" onclick="switchTab('settings')">
+        <i class="fa-solid fa-gears"></i> Cấu hình
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- 1. OVERVIEW PANEL -->
+    <div id="panel-overview" class="view-panel active">
+      <div class="controls-row">
+        <div class="select-container">
+          <label for="date-selector">Ngày báo cáo:</label>
+          <select id="date-selector" onchange="onDateChange()">
+            <!-- Generated dynamically -->
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <span id="data-source-badge"
+            style="font-size: 12px; padding: 6px 12px; border-radius: 20px; background: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.4); display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-database"></i> Dữ liệu: <span id="data-source-name">JSONBin</span>
+          </span>
+          <button class="btn-sync" onclick="fetchData()">
+            <i class="fa-solid fa-rotate"></i> Đồng bộ dữ liệu
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Grid -->
+      <div class="kpi-grid">
+        <!-- 1. Sản lượng D -->
+        <div class="kpi-card blue">
+          <div class="kpi-header">
+            <span class="kpi-title">Sản lượng (Ngày D)</span>
+            <i class="fa-solid fa-box kpi-icon"></i>
+          </div>
+          <div id="kpi-output-d" class="kpi-value">0</div>
+          <div id="kpi-output-sub" class="kpi-subtext">
+            <!-- Growth subtext -->
+          </div>
+        </div>
+
+        <!-- 2. Doanh thu D -->
+        <div class="kpi-card emerald">
+          <div class="kpi-header">
+            <span class="kpi-title">Doanh thu thực thu</span>
+            <i class="fa-solid fa-hand-holding-dollar kpi-icon"></i>
+          </div>
+          <div id="kpi-revenue-d" class="kpi-value">0 đ</div>
+          <div id="kpi-revenue-sub" class="kpi-subtext">
+            <!-- Revenue growth subtext -->
+          </div>
+        </div>
+
+        <!-- 3. Tỷ lệ rụng -->
+        <div class="kpi-card rose">
+          <div class="kpi-header">
+            <span class="kpi-title">Tỷ lệ KHHH có mã CMS không phát sinh doanh thu (5 ngày)</span>
+            <i class="fa-solid fa-user-slash kpi-icon"></i>
+          </div>
+          <div id="kpi-churn-rate" class="kpi-value">0%</div>
+          <div class="kpi-subtext text-neutral">
+            So với tổng KH phát sinh 5 ngày trước
+          </div>
+        </div>
+
+        <!-- 4. Tỷ lệ DT -->
+        <div class="kpi-card amber">
+          <div class="kpi-header">
+            <span class="kpi-title">Biến động DT (D / D-1)</span>
+            <i class="fa-solid fa-scale-balanced kpi-icon"></i>
+          </div>
+          <div id="kpi-rev-ratio" class="kpi-value">0%</div>
+          <div class="kpi-subtext text-neutral">
+            Doanh thu so với kỳ trước liền kề
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts & Tables Panel -->
+      <div class="dashboard-details">
+        <!-- Left panel: Charts & trends -->
+        <div class="card-panel">
+          <div class="panel-title">
+            <i class="fa-solid fa-chart-area" style="color: var(--accent-indigo);"></i>
+            Biểu đồ xu hướng (Trend Analysis)
+          </div>
+
+          <div class="charts-grid">
+            <div class="chart-container">
+              <canvas id="chart-output"></canvas>
+            </div>
+            <div class="chart-container">
+              <canvas id="chart-revenue"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right panel: Alerts & Message -->
+        <div class="card-panel" style="gap: 15px;">
+          <div class="panel-title">
+            <i class="fa-solid fa-bell" style="color: var(--accent-rose);"></i>
+            Bưu cục cần lưu ý (Giảm > 20%)
+          </div>
+          <div id="alerts-container"
+            style="display: flex; flex-direction: column; gap: 10px; max-height: 180px; overflow-y: auto; padding-right: 5px;">
+            <!-- Alert items generated dynamically -->
+          </div>
+
+          <div class="panel-title" style="margin-top: 10px;">
+            <i class="fa-solid fa-envelope" style="color: var(--accent-blue);"></i>
+            Nội dung tin nhắn báo cáo
+          </div>
+          <textarea id="message-viewer" class="message-viewer" readonly></textarea>
+        </div>
+      </div>
+
+      <!-- Top 20 Panels -->
+      <div class="dashboard-details" style="margin-top: 20px;">
+        <!-- Left: Top 20 Cao nhất -->
+        <div class="card-panel">
+          <div class="panel-title">
+            <i class="fa-solid fa-arrow-trend-up" style="color: var(--accent-emerald);"></i>
+            Top 20 Bưu cục Sản lượng Cao nhất
+          </div>
+          <div id="top-highest-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 5px; margin-top: 10px;">
+            <div class="empty-alerts">Không có dữ liệu</div>
+          </div>
+        </div>
+
+        <!-- Right: Top 20 Thấp nhất -->
+        <div class="card-panel">
+          <div class="panel-title">
+            <i class="fa-solid fa-arrow-trend-down" style="color: var(--accent-rose);"></i>
+            Top 20 Bưu cục Sản lượng Thấp nhất
+          </div>
+          <div id="top-lowest-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding-right: 5px; margin-top: 10px;">
+            <div class="empty-alerts">Không có dữ liệu</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. DETAILS PANEL (Google Sheets Embed) -->
+    <div id="panel-details" class="view-panel">
+      <div class="sheet-container">
+        <div id="sheet-wrapper" style="width: 100%; height: 100%;">
+          <div class="sheet-placeholder">
+            <i class="fa-solid fa-table-list"></i>
+            <h2>Chưa cấu hình liên kết Google Sheets</h2>
+            <p style="color: var(--text-muted); max-width: 500px;">
+              Vui lòng chuyển qua tab "Cấu hình", dán đường dẫn chia sẻ hoặc mã nhúng iframe của Google Sheets vào để
+              hiển thị bảng dữ liệu chi tiết tại đây.
+            </p>
+            <button class="btn-sync" onclick="switchTab('settings')" style="margin-top: 10px;">
+              Đi tới Cấu hình
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SETTINGS PANEL -->
+    <div id="panel-settings" class="view-panel">
+      <div class="settings-grid">
+        <div class="card-panel">
+          <div class="panel-title">
+            <i class="fa-solid fa-gears" style="color: var(--accent-indigo);"></i>
+            Cấu hình liên kết Dữ liệu
+          </div>
+
+          <div class="form-group" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 15px; margin-bottom: 5px;">
+              <label style="font-weight: 600;">1. Đường dẫn nhúng bảng Google Sheets (Hiển thị chi tiết):</label>
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.4; margin: 5px 0 10px 0;">
+                Mở Google Sheets -> Chọn <strong>Tệp (File)</strong> -> <strong>Chia sẻ (Share)</strong> -> <strong>Công
+                  bố lên web (Publish to web)</strong> -> Chọn <strong>Trang web (Web page)</strong> -> Nhấn
+                <strong>Công bố (Publish)</strong> rồi sao chép liên kết dán vào đây.
+              </p>
+              <input type="text" id="sheet-url-input" class="input-sheet-url" style="max-width: 100%;"
+                placeholder="https://docs.google.com/spreadsheets/d/.../pubhtml">
+            </div>
+
+            <div style="padding-top: 5px;">
+              <label style="font-weight: 600;">2. Địa chỉ Google Apps Script Web App URL (Để tải lịch sử lưu trữ từ
+                Sheets):</label>
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.4; margin: 5px 0 10px 0;">
+                Dán đường dẫn Apps Script kết thúc bằng <code>/exec</code> của bạn vào đây (đường dẫn đã sử dụng trong
+                Extension). Nếu được cấu hình, Dashboard sẽ lấy lịch sử vĩnh viễn trực tiếp từ Google Sheets thay vì
+                JSONBin!
+              </p>
+              <input type="text" id="script-url-input" class="input-sheet-url" style="max-width: 100%;"
+                placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+
+            <button class="btn-sync" onclick="saveSettings()" style="width: fit-content; margin-top: 15px;">
+              <i class="fa-solid fa-floppy-disk"></i> Lưu cấu hình
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Config JSONBin.io (Backup Source)
+    const BIN_ID = "6a1d9b4addf5aa59f7805677";
+    const API_KEY = "$2a$10$FvjY8ltYSrSb5imGs4SJBu8sNvfNszkcxl0yNNS71LgcXcAu1hdJG";
+
+    let historicalData = [];
+    let charts = {};
+
+    // Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      // Hardcoded URLs (Thay đổi ở đây để chạy tự động trên Netlify)
+      const HARDCODED_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw16hPG8dasu4dO_ocR68fNaHjrbPfmVX7k7iJ4xqBjel0cmvLoHbXMzSLGP23tG-odGg/exec";
+      const HARDCODED_SHEET_URL = ""; // <-- Dán link Google Sheets (Publish to Web) của bạn vào giữa 2 dấu nháy này nếu muốn hiện bảng chi tiết
+
+      // Load Google Sheet URL from hardcoded or localStorage
+      const savedUrl = HARDCODED_SHEET_URL || localStorage.getItem('google_sheet_url');
+      if (savedUrl) {
+        document.getElementById('sheet-url-input').value = savedUrl;
+        updateSheetIframe(savedUrl);
+      }
+
+      // Load Apps Script URL from hardcoded or localStorage
+      const savedScriptUrl = HARDCODED_SCRIPT_URL || localStorage.getItem('apps_script_url');
+      if (savedScriptUrl) {
+        document.getElementById('script-url-input').value = savedScriptUrl;
+      }
+
+      // Fetch data
+      fetchData();
+    });
+
+    // Fetch data from Apps Script (Primary) or JSONBin (Fallback)
+    async function fetchData() {
+      showLoading(true, "Đang tải dữ liệu báo cáo...");
+
+      const HARDCODED_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw16hPG8dasu4dO_ocR68fNaHjrbPfmVX7k7iJ4xqBjel0cmvLoHbXMzSLGP23tG-odGg/exec";
+      const savedScriptUrl = HARDCODED_SCRIPT_URL || localStorage.getItem('apps_script_url');
+
+      if (savedScriptUrl) {
+        try {
+          showLoading(true, "Đang đồng bộ lịch sử vĩnh viễn từ Google Sheets...");
+          const response = await fetch(`${savedScriptUrl}?action=getSummary`, {
+            method: "GET"
+          });
+
+          if (!response.ok) throw new Error("Lỗi HTTP " + response.status);
+
+          const data = await response.json();
+          if (Array.isArray(data)) {
+            historicalData = data;
+            document.getElementById('data-source-name').textContent = "Google Sheets (Lịch sử)";
+            document.getElementById('data-source-badge').style.borderColor = "rgba(16, 185, 129, 0.4)";
+            document.getElementById('data-source-badge').style.background = "rgba(16, 185, 129, 0.2)";
+
+            processAndRender();
+            showLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.warn("Không thể tải từ Google Sheets Apps Script, thử chuyển sang JSONBin fallback...", e);
+        }
+      }
+
+      // JSONBin Fallback
+      try {
+        showLoading(true, "Đang đồng bộ dữ liệu từ JSONBin (Dự phòng)...");
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+          method: "GET",
+          headers: {
+            "X-Master-Key": API_KEY,
+            "X-Bin-Meta": "false"
+          }
+        });
+
+        if (!response.ok) throw new Error("Không thể tải dữ liệu.");
+
+        let data = await response.json();
+
+        if (data.record) {
+          historicalData = Array.isArray(data.record) ? data.record : (data.record.reports || [data.record]);
+        } else {
+          historicalData = Array.isArray(data) ? data : [];
+        }
+
+        document.getElementById('data-source-name').textContent = "JSONBin (Dự phòng)";
+        document.getElementById('data-source-badge').style.borderColor = "rgba(59, 130, 246, 0.4)";
+        document.getElementById('data-source-badge').style.background = "rgba(59, 130, 246, 0.2)";
+
+        processAndRender();
+      } catch (e) {
+        alert("Không thể tải dữ liệu từ cả hai nguồn (Google Sheets & JSONBin): " + e.message);
+        console.error(e);
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function processAndRender() {
+      // Sắp xếp tăng dần theo ngày để vẽ biểu đồ chính xác
+      historicalData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      populateDateSelector();
+      updateDashboard();
+      renderCharts();
+    }
+
+    // Toggle tab panels
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+
+      // Active tab btn
+      const clickedBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.getAttribute('onclick').includes(tabId));
+      if (clickedBtn) clickedBtn.classList.add('active');
+
+      // Active panel
+      document.getElementById(`panel-${tabId}`).classList.add('active');
+    }
+
+    // Populate date select dropdown
+    function populateDateSelector() {
+      const selector = document.getElementById('date-selector');
+      selector.innerHTML = '';
+
+      if (historicalData.length === 0) {
+        const opt = document.createElement('option');
+        opt.textContent = "Không có dữ liệu";
+        selector.appendChild(opt);
+        return;
+      }
+
+      // Show latest dates first in dropdown
+      const dates = [...historicalData].reverse();
+      dates.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.date;
+        opt.textContent = formatDateString(item.date);
+        selector.appendChild(opt);
+      });
+    }
+
+    // Format YYYY-MM-DD to Ngày DD/MM/YYYY
+    function formatDateString(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('-');
+      if (parts.length === 3) return `Ngày ${parts[2]}/${parts[1]}/${parts[0]}`;
+      return dateStr;
+    }
+
+    // Handle date selector change
+    function onDateChange() {
+      updateDashboard();
+    }
+
+    // Update KPIs, Alerts and Textarea
+    function updateDashboard() {
+      const selectedDate = document.getElementById('date-selector').value;
+      const report = historicalData.find(r => r.date === selectedDate);
+
+      if (!report) return;
+
+      // Output KPI
+      document.getElementById('kpi-output-d').textContent = formatNumber(report.outD) + " cái";
+      const outputDiff = report.outD - report.outD1;
+      const growthText = report.outGrowth || "";
+      const isOutGrowth = outputDiff >= 0;
+
+      document.getElementById('kpi-output-sub').innerHTML = `
+        <span class="${isOutGrowth ? 'trend-up' : 'trend-down'}">
+          <i class="fa-solid ${isOutGrowth ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i>
+          ${growthText}
+        </span>
+        <span class="text-neutral">so với D-1 (${formatNumber(report.outD1)})</span>
+      `;
+
+      // Revenue KPI
+      document.getElementById('kpi-revenue-d').textContent = formatNumber(report.revD) + " đ";
+      const revDiff = report.revD - report.revD1;
+      const isRevGrowth = revDiff >= 0;
+      const revGrowthPercent = report.revD1 > 0 ? ((Math.abs(revDiff) / report.revD1) * 100).toFixed(1) + "%" : "0%";
+      const revGrowthDirectionText = isRevGrowth ? "tăng" : "giảm";
+
+      document.getElementById('kpi-revenue-sub').innerHTML = `
+        <span class="${isRevGrowth ? 'trend-up' : 'trend-down'}">
+          <i class="fa-solid ${isRevGrowth ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'}"></i>
+          ${revGrowthDirectionText} ${revGrowthPercent}
+        </span>
+        <span class="text-neutral">so với D-1 (${formatNumber(report.revD1)} đ)</span>
+      `;
+
+      // Churn Rate
+      document.getElementById('kpi-churn-rate').textContent = (report.churnRate || 0) + "%";
+
+      // Revenue Ratio
+      document.getElementById('kpi-rev-ratio').textContent = (report.revRatio || 0) + "%";
+
+      // Alerts: Bưu cục giảm > 20%
+      const alertsContainer = document.getElementById('alerts-container');
+      alertsContainer.innerHTML = '';
+
+      if (report.badUnits && report.badUnits.length > 0) {
+        report.badUnits.forEach(unit => {
+          const div = document.createElement('div');
+          div.className = 'alert-item';
+          div.innerHTML = `
+            <i class="fa-solid fa-triangle-exclamation alert-icon"></i>
+            <span class="alert-text">${unit.replace(/^- /, '')}</span>
+          `;
+          alertsContainer.appendChild(div);
+        });
+      } else {
+        const div = document.createElement('div');
+        div.className = 'empty-alerts';
+        div.innerHTML = `<i class="fa-solid fa-circle-check"></i> Không có đơn vị nào giảm quá 20%`;
+        alertsContainer.appendChild(div);
+      }
+
+      // Top 20 Highest
+      const highestContainer = document.getElementById('top-highest-container');
+      highestContainer.innerHTML = '';
+      if (report.top20Highest && report.top20Highest.length > 0) {
+        report.top20Highest.forEach((unit, idx) => {
+          const div = document.createElement('div');
+          div.className = 'top-unit-item';
+          div.innerHTML = `
+            <span class="top-unit-name"><span style="color: var(--text-muted); width: 20px;">#${idx+1}</span> ${unit.name}</span>
+            <span class="top-unit-val">${unit.output.toLocaleString()}</span>
+          `;
+          highestContainer.appendChild(div);
+        });
+      } else {
+        highestContainer.innerHTML = `<div class="empty-alerts">Không có dữ liệu xếp hạng</div>`;
+      }
+
+      // Top 20 Lowest
+      const lowestContainer = document.getElementById('top-lowest-container');
+      lowestContainer.innerHTML = '';
+      if (report.top20Lowest && report.top20Lowest.length > 0) {
+        report.top20Lowest.forEach((unit, idx) => {
+          const div = document.createElement('div');
+          div.className = 'top-unit-item';
+          div.innerHTML = `
+            <span class="top-unit-name"><span style="color: var(--text-muted); width: 20px;">#${idx+1}</span> ${unit.name}</span>
+            <span class="top-unit-val">${unit.output.toLocaleString()}</span>
+          `;
+          lowestContainer.appendChild(div);
+        });
+      } else {
+        lowestContainer.innerHTML = `<div class="empty-alerts">Không có dữ liệu xếp hạng</div>`;
+      }
+
+      // Raw Message
+      document.getElementById('message-viewer').value = report.message || '';
+    }
+
+    // Render Charts
+    function renderCharts() {
+      const dates = historicalData.map(d => formatDateString(d.date));
+      const outputs = historicalData.map(d => d.outD);
+      const revenues = historicalData.map(d => d.revD);
+
+      // 1. Output Chart
+      if (charts.output) charts.output.destroy();
+      const ctxOutput = document.getElementById('chart-output').getContext('2d');
+      charts.output = new Chart(ctxOutput, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Sản lượng (cái)',
+            data: outputs,
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#64748b', font: { family: 'Outfit' } } }
+          },
+          scales: {
+            x: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#64748b' } },
+            y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#64748b' } }
+          }
+        }
+      });
+
+      // 2. Revenue Chart
+      if (charts.revenue) charts.revenue.destroy();
+      const ctxRevenue = document.getElementById('chart-revenue').getContext('2d');
+      charts.revenue = new Chart(ctxRevenue, {
+        type: 'bar',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Doanh thu (Đồng)',
+            data: revenues,
+            backgroundColor: 'rgba(16, 185, 129, 0.75)',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { labels: { color: '#64748b', font: { family: 'Outfit' } } }
+          },
+          scales: {
+            x: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#64748b' } },
+            y: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { color: '#64748b' } }
+          }
+        }
+      });
+    }
+
+    // Save configuration
+    function saveSettings() {
+      const url = document.getElementById('sheet-url-input').value.trim();
+      const scriptUrl = document.getElementById('script-url-input').value.trim();
+
+      localStorage.setItem('google_sheet_url', url);
+      localStorage.setItem('apps_script_url', scriptUrl);
+
+      updateSheetIframe(url);
+      alert("Đã lưu cấu hình dữ liệu thành công!");
+      fetchData();
+      switchTab('overview');
+    }
+
+    // Update embedded sheet iframe URL
+    function updateSheetIframe(url) {
+      const wrapper = document.getElementById('sheet-wrapper');
+      if (!url) {
+        wrapper.innerHTML = `
+          <div class="sheet-placeholder">
+            <i class="fa-solid fa-table-list"></i>
+            <h2>Chưa cấu hình liên kết Google Sheets</h2>
+            <p style="color: var(--text-muted); max-width: 500px;">
+              Vui lòng chuyển qua tab "Cấu hình", dán đường dẫn chia sẻ hoặc mã nhúng iframe của Google Sheets vào để hiển thị bảng dữ liệu chi tiết tại đây.
+            </p>
+            <button class="btn-sync" onclick="switchTab('settings')" style="margin-top: 10px;">
+              Đi tới Cấu hình
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      let embedUrl = url;
+      if (url.includes('docs.google.com/spreadsheets') && !url.includes('pubhtml')) {
+        const matches = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        if (matches && matches[1]) {
+          embedUrl = `https://docs.google.com/spreadsheets/d/${matches[1]}/htmlembed?widget=true&headers=false`;
+        }
+      }
+
+      wrapper.innerHTML = `<iframe class="sheet-iframe" src="${embedUrl}"></iframe>`;
+    }
+
+    // Helpers
+    function showLoading(show, text = "Đang tải dữ liệu...") {
+      document.getElementById('loading-text').textContent = text;
+      document.getElementById('loading-screen').style.display = show ? 'flex' : 'none';
+    }
+
+    function formatNumber(num) {
+      if (num === null || num === undefined) return '0';
+      return Number(num).toLocaleString('vi-VN');
+    }
+  </script>
+</body>
+
+</html>

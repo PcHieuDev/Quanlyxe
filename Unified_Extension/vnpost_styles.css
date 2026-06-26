@@ -1,0 +1,122 @@
+#vnpost-export-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 280px;
+  background-color: #1e293b;
+  color: white;
+  padding: 15px 25px;
+  display: flex;
+  align-items: stretch;
+  gap: 30px;
+  box-shadow: 0 -5px 15px rgba(0,0,0,0.4);
+  z-index: 999999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+#vnpost-export-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 320px;
+  flex-shrink: 0;
+}
+
+#vnpost-export-right {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#vnpost-export-right textarea {
+  flex-grow: 1;
+  width: 100%;
+  background: #0f172a;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  font-family: monospace;
+}
+
+#vnpost-export-right textarea:focus {
+  border-color: #3b82f6;
+}
+
+.vnpost-flex-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+#vnpost-export-footer label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+#vnpost-export-footer input {
+  padding: 8px 10px;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+  background: #334155;
+  color: white;
+  color-scheme: dark;
+}
+
+#vnpost-export-footer input:focus {
+  border-color: #3b82f6;
+}
+
+#vnpost-export-footer .btn {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: #2563eb;
+  color: white;
+  transition: background-color 0.2s;
+  flex-grow: 1;
+}
+
+#vnpost-export-footer .btn:hover {
+  background-color: #1d4ed8;
+}
+
+#vnpost-export-footer .btn-green {
+  background-color: #059669 !important;
+}
+#vnpost-export-footer .btn-green:hover {
+  background-color: #047857 !important;
+}
+
+#vnpost-export-footer .btn:disabled {
+  background-color: #475569 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed;
+}
+
+#export-status {
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 5px;
+}
+.export-error { color: #ef4444; }
+.export-success { color: #10b981; }
+.export-loading { color: #f59e0b; }
