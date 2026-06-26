@@ -1,0 +1,88 @@
+#quanlyxe-sync-panel {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 999999;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+.qx-header {
+    background: #0d6efd;
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.qx-body {
+    padding: 16px;
+}
+
+.qx-desc {
+    font-size: 13px;
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
+
+.qx-form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    justify-content: space-between;
+}
+
+.qx-form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+}
+
+.qx-form-group input {
+    width: 80px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+}
+
+#qx-submit-btn {
+    width: 100%;
+    background: #198754;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+
+#qx-submit-btn:hover {
+    background: #157347;
+}
+
+#qx-submit-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+#qx-message {
+    padding: 0 16px 16px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+}

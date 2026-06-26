@@ -211,6 +211,115 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel_file'])) {
     }
 }
 
+// Xử lý Đồng bộ từ Google Sheet
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sync_google_sheet'])) {
+    try {
+        $url = 'https://script.google.com/macros/s/AKfycbwoBZZFON_3u0V8b9Pak8_vvK8lE99haAOD1X533PfTyf_TN5jTywNDD38ANtAY8L_L/exec';
+        
+        $context = stream_context_create([
+            "http" => [
+                "method" => "GET",
+                "header" => "Accept: application/json\r\n"
+            ],
+            "ssl" => [
+                "verify_peer" => false,
+                "verify_peer_name" => false,
+            ],
+        ]);
+        $response = @file_get_contents($url, false, $context);
+        
+        if ($response === false) {
+            throw new Exception("Không thể kết nối đến Google Sheet API. Vui lòng kiểm tra lại mạng hoặc URL.");
+        }
+        
+        $json = json_decode($response, true);
+        if (!$json || empty($json['success']) || !isset($json['data'])) {
+             throw new Exception("Dữ liệu từ Google Sheet trả về không hợp lệ.");
+        }
+        
+        $sheetData = $json['data'];
+        
+        if (count($sheetData) <= 1) { // 1 dòng header
+            throw new Exception("Bảng tính Google Sheet hiện tại chưa có dữ liệu nào.");
+        }
+        
+        // Bỏ dòng tiêu đề (header)
+        array_shift($sheetData);
+
+        // Lấy danh sách xe chuẩn hóa
+        $all_vehicles = [];
+        $stmt_all = $conn->query("SELECT id, bien_kiem_soat FROM vehicles");
+        while ($v = $stmt_all->fetch(PDO::FETCH_ASSOC)) {
+            $normalized = preg_replace('/\s+/u', '', $v['bien_kiem_soat']);
+            $all_vehicles[$normalized] = $v;
+        }
+
+        $conn->beginTransaction();
+
+        foreach ($sheetData as $row) {
+            // Cột: [Biển số, Tháng, Năm, Số KM, Thời gian]
+            if (count($row) < 4) continue;
+            
+            $bien_so_raw = trim((string)$row[0]);
+            $thang = (int)$row[1];
+            $nam = (int)$row[2];
+            $km_thang_nay = (float)str_replace(',', '', (string)$row[3]);
+            
+            if (empty($bien_so_raw) || $km_thang_nay <= 0 || $thang <= 0 || $nam <= 0) continue;
+            
+            $bien_so_clean = preg_replace('/\s+/u', '', $bien_so_raw);
+            
+            if (!isset($all_vehicles[$bien_so_clean])) {
+                $warnings[] = "❌ Google Sheet: Xe '$bien_so_raw' không tồn tại trong hệ thống!";
+                continue;
+            }
+            
+            $vehicle_id = $all_vehicles[$bien_so_clean]['id'];
+            
+            // Kiểm tra cảnh báo thay dầu (> 5000km)
+            if ($km_thang_nay > 5000) {
+                $warnings[] = "⚠️ XE $bien_so_raw ĐÃ ĐI $km_thang_nay KM TRONG THÁNG $thang/$nam - CẦN THAY DẦU!";
+            }
+
+            // Kiểm tra xem đã có dữ liệu tháng này chưa
+            $check = $conn->prepare("SELECT id FROM operation_stats WHERE vehicle_id = ? AND nam = ? AND thang = ?");
+            $check->execute([$vehicle_id, $nam, $thang]);
+            
+            if ($check->rowCount() > 0) {
+                $stmt = $conn->prepare("UPDATE operation_stats SET km_trong_thang = ? WHERE vehicle_id = ? AND nam = ? AND thang = ?");
+                $stmt->execute([$km_thang_nay, $vehicle_id, $nam, $thang]);
+            } else {
+                $stmt = $conn->prepare("INSERT INTO operation_stats (vehicle_id, nam, thang, km_trong_thang, km_tich_luy, so_chuyen_trong_thang) VALUES (?, ?, ?, ?, 0, 0)");
+                $stmt->execute([$vehicle_id, $nam, $thang, $km_thang_nay]);
+            }
+            $success_count++;
+        }
+
+        $conn->commit();
+        
+        // Cập nhật tích lũy sau khi hoàn thành
+        foreach ($sheetData as $row) {
+            if (count($row) < 4) continue;
+            $bien_so_clean = preg_replace('/\s+/u', '', trim((string)$row[0]));
+            if (isset($all_vehicles[$bien_so_clean])) {
+                updateCumulativeKM($conn, $all_vehicles[$bien_so_clean]['id']);
+            }
+        }
+
+        if ($success_count > 0) {
+            $message = "<div class='alert alert-success'><i class='fa-solid fa-check-circle me-2'></i>Đã đồng bộ thành công $success_count dữ liệu xe từ Google Sheet!</div>";
+        } else {
+             $message = "<div class='alert alert-info'><i class='fa-solid fa-info-circle me-2'></i>Không có dữ liệu hợp lệ nào được cập nhật.</div>";
+        }
+
+    } catch (Exception $e) {
+        if ($conn->inTransaction()) {
+            $conn->rollBack();
+        }
+        $message = "<div class='alert alert-danger'><i class='fa-solid fa-exclamation-triangle me-2'></i>" . $e->getMessage() . "</div>";
+    }
+}
+
 // Xử lý logic xem dữ liệu tháng (Filter)
 $thang_hien_tai = isset($_GET['month']) ? (int)$_GET['month'] : (int)date('n');
 $nam_hien_tai = isset($_GET['year']) ? (int)$_GET['year'] : (int)date('Y');
@@ -318,9 +427,27 @@ $current_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
             
-            <div class="alert alert-warning small">
+            <div class="alert alert-warning small mt-3">
                 <i class="fa-solid fa-exclamation-triangle me-1"></i>
                 Lưu ý: Dữ liệu sẽ được import vào Tháng/Năm bạn chọn ở trên.
+            </div>
+
+            <!-- Block Google Sheet Sync -->
+            <div class="card mt-4 shadow-sm border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fa-brands fa-google me-2"></i>Đồng bộ từ Google Sheet</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted mb-3">
+                        Tự động kéo dữ liệu KM mới nhất được đẩy lên Google Sheet từ Extension trên trình duyệt của bạn.
+                    </p>
+                    <form method="POST">
+                        <input type="hidden" name="sync_google_sheet" value="1">
+                        <button type="submit" class="btn btn-success w-100 fw-bold">
+                            <i class="fa-solid fa-rotate me-2"></i>Kéo Dữ Liệu Ngay
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 

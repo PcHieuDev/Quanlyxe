@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Quanlyxe KM Importer",
+  "version": "1.0",
+  "description": "Tiện ích đồng bộ số KM từ trang quanlyxe.vn về hệ thống nội bộ",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://10.42.40.20:8388/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://quanlyxe.vn/*", "*://www.quanlyxe.vn/*"],
+      "css": ["styles.css"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
